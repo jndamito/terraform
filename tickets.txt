@@ -1,0 +1,12 @@
+Ticket 001: Unable to SSH into Maven instance from the Bastion Host
+    Resolution: Added transit gateways to public and private and public subnets in the prod VPC and Bastion VPC
+
+Ticket 002: Unable to run code quality analysis using Sonarcloud
+    Resolution: Added properties tag in Pom.xml and plugins tag
+        - <sonar.organization>
+        - <sonar.host.url>
+        - <sonar.projectKey>
+        - <sonar.token>
+
+Ticket 003: Unable to do execute mvn command
+    Resolution: Exported env variable into .bashrc
