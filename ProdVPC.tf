@@ -1,12 +1,12 @@
 resource "aws_vpc" "prodvpc" {
-  cidr_block       = "172.32.0.0/16"
+  cidr_block       = "10.32.0.0/16"
   instance_tenancy = "default"
 
   enable_dns_hostnames = true
   enable_dns_support = true
 
   tags = {
-    Name = "prodvpc"
+    Name = "eks_vpc"
   }
 }
 
@@ -25,6 +25,8 @@ resource "aws_subnet" "prodpublic" {
 
   tags = {
     Name = var.public_subnet_names[count.index]
+    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/demo" = "owned"
   }
 }
 
@@ -35,8 +37,11 @@ resource "aws_subnet" "private_subnets" {
   cidr_block              = element(var.private_subnet_cidrs, count.index)
   availability_zone       = element(var.azs, count.index)
   map_public_ip_on_launch = false
+
   tags = {
     Name = var.private_subnet_names[count.index]
+    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/demo" = "owned"
   }
 }
 
@@ -51,6 +56,8 @@ resource "aws_nat_gateway" "prod_natgw" {
 
 resource "aws_route_table" "public_RT_prod" {
   vpc_id = aws_vpc.prodvpc.id
+
+  depends_on = [ aws_subnet.prodpublic ]
 
   route {
     gateway_id = aws_internet_gateway.prod_igw.id
@@ -71,6 +78,8 @@ resource "aws_route_table_association" "publicRTA" {
 
 resource "aws_route_table" "private_RT_prod1" {
   vpc_id = aws_vpc.prodvpc.id
+
+  depends_on = [ aws_subnet.private_subnets ]
   
   route {
     nat_gateway_id = aws_nat_gateway.prod_natgw.id
@@ -83,31 +92,12 @@ resource "aws_route_table" "private_RT_prod1" {
 
 }
 
-resource "aws_route_table_association" "first_4_subnets_association" {
+resource "aws_route_table_association" "private_RTA" {
   count          = 4  # This specifies that we are associating the first 4 subnets
   subnet_id      = aws_subnet.private_subnets[count.index].id
   route_table_id = aws_route_table.private_RT_prod1.id
 }
 
-resource "aws_route_table" "private_RT_prod2" {
-  vpc_id = aws_vpc.prodvpc.id
-  
-  route {
-    nat_gateway_id = aws_nat_gateway.prod_natgw.id
-    cidr_block = "0.0.0.0/0"
-  }
-  
-  tags = {
-    Name = "Private_RT_prod2"
-  }
-
-}
-
-resource "aws_route_table_association" "last_3_subnets_association" {
-  count          = length(var.private_subnet_cidrs) - 4  # This specifies that we are associating the last 3 subnets
-  subnet_id      = aws_subnet.private_subnets[count.index + 4].id
-  route_table_id = aws_route_table.private_RT_prod2.id
-}
 
 /*
 # Transit gateway

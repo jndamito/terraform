@@ -1,13 +1,13 @@
 variable "public_subnet_cidrs" {
   type        = list(string)
   description = "Public Subnet CIDR values"
-  default     = ["172.32.1.0/24", "172.32.2.0/24"]
+  default     = ["10.32.1.0/24", "10.32.2.0/24"]
 }
 
 variable "private_subnet_cidrs" {
   type        = list(string)
   description = "Private Subnet CIDR values"
-  default     = ["172.32.4.0/24", "172.32.5.0/24", "172.32.6.0/24", "172.32.7.0/24", "172.32.8.0/24", "172.32.9.0/24", "172.32.10.0/24"]
+  default     = ["10.32.4.0/24", "10.32.5.0/24", "10.32.6.0/24", "10.32.7.0/24"]
 }
 
 variable "azs" {
@@ -18,11 +18,11 @@ variable "azs" {
 
 variable "private_subnet_names" {
   type = list(string)
-  default = [ "Private_subnet1_nginx", "Private_subnet2_nginx", "Private_subnet3_app", "Private_subnet4_app", "Private_subnet5_nlb", "Private_subnet6_nlb", "Private_subnet6_maven" ]
+  default = [ "Private_subnet1", "Private_subnet2", "Private_subnet3", "Private_subnet4"]
 }
 
 variable "public_subnet_names" {
   type = list(string)
-  default = [ "Public_subnet_NLB_NAT_1", "Public_subnet_NLB_NAT_2" ]
+  default = [ "Public_subnet_1", "Public_subnet_2" ]
 }
 
